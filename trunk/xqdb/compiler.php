@@ -60,7 +60,7 @@ class Compiler extends DocReader
     /* Main-Module */
     if ($this->infos['Type'] == "Main") {
       $instructions = "<?PHP"
-         . CODE_SEP . "require_once ('../xqvm.php');"
+         . CODE_SEP . "require_once ('../xqdb/xqvm.php');"
          . $moduleInclude;
          foreach ($this->functions as $function) {
            $instructions .= CODE_SEP . $function['Body'];
