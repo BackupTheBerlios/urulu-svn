@@ -33,18 +33,20 @@ function output($output) {
 					$handle = fopen ($filename, "r");
 					$xsl_contents = fread ($handle, filesize ($filename));
 					fclose ($handle);
-					$xsl = sprintf($xsl_contents, 'content/eintragen.familie.add.xsl');
+					/* :TODO: Anpassen des xsc fuer die Uebergabe des Templatefiles */
+					$xsl = sprintf($xsl_contents, $_SESSION['variables']['template_content']);
 					
 					/* Stylesheet uebergeben */
 					$processor_arguments = array(
-					'/_xsl' => $xsl
+						'/_xml' => $output,
+						'/_xsl' => $xsl
 					);
 					$processor = xslt_create();
 					xslt_set_encoding($processor, 'ISO-8859-1');
-					xslt_set_base($processor, "file://C:/_homepageprojekte/urulu/temp/");
+					xslt_set_base($processor, 'file://' . BIN_DIR . 'xslt/' );
 					
 					/* Transformiert den Output */
-					$result = xslt_process($processor, 'index.xml', 'arg:/_xsl' , NULL, $processor_arguments);
+					$result = xslt_process($processor, 'arg:/_xml', 'arg:/_xsl' , NULL, $processor_arguments);
 					if(!$result && xslt_errno($processor)>0){
 						$result = sprintf("Kann XSLT Dokument nicht umarbeiten [%d]: %s", xslt_errno($processor), xslt_error($processor));
 					}
