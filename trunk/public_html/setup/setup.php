@@ -8,11 +8,13 @@
 define("XQDB_Install", true);
  
 /* Virtual machine laden */ 
-require_once(realpath("../../xqvm.php"));
+ini_set("include_path", realpath("../../xqdb") . ";" . ini_get("include_path") . ";" . realpath("../../pear"));
+require_once(realpath("../../xqdb/xqvm.php"));
+$GLOBALS['XQDB_SOURCE_DIRS'] = array(realpath("../../cms") . "/", realpath("../../etat") . "/");
 
 /* Alle Tabellen in der Datenbank erstellen */
 __install();
 
 /* Alle Module Kompilieren */
-require_once(BASE_DIR . "compile.php");
+require_once("../../xqdb/compile.php");
 ?>

@@ -6,7 +6,9 @@ if (defined("XQDB_VM")) {
 define("XQDB_VM", true);
 
 /* Includepfad setzen */
-ini_set("include_path", realpath("../xqdb") . ";" . ini_get("include_path") . ";" . realpath("../pear"));
+if (defined("XQDB_Install") == false) {
+  ini_set("include_path", realpath("../xqdb") . ";" . ini_get("include_path") . ";" . realpath("../pear"));
+}
  
 /* Pear laden */
 require_once("PEAR.php");

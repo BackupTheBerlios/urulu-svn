@@ -1,4 +1,5 @@
 import module "libetat";
+import module "libuser";
 
 (: Ausgabe erstellen :)
 <application> {

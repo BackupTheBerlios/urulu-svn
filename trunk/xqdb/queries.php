@@ -19,6 +19,7 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
     id INT(11) NOT NULL AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL default '',
     passwd VARCHAR(32) NOT NULL default '',
+    email VARCHAR(255) NOT NULL default '',
     KEY name (name(10)),
     PRIMARY KEY (id)
   ) TYPE=MyISAM AUTO_INCREMENT=1", 0),
@@ -44,6 +45,13 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
     UNIQUE KEY sess (id, hash)
   ) TYPE=Heap", 0),
 
+/*
+   Queries zur Benuzterverwalutng
+ */
+  'user_insert' => array("INSERT INTO user (name, passwd, email) VALUES ('?', '?', '?')", 3),
+  'user_exist' => array("SELECT * FROM user WHERE name='?'", 1),
+  'user_drop' => array("DELETE FROM user WHERE name='?'", 1),
+  
 /*
    Queries zur Verwaltung der Sessions
  */

@@ -141,9 +141,10 @@ function __rollback($context, $uri) {
 }
 
 /* Funktion um auf die Variablen, die in der Session gespeichert sind zuzugreifen
+   string[] $context: Kontextknoten in der Funktion
    string[] return: Gibt eine Sequenz mit den Dokumentknoten zurück
  */
-function __session() {
+function __session($context) {
   return __importPHPVar($_SESSION['variables'], "_SESSION/variables", -2);
 }
 ?>
