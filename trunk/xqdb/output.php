@@ -10,7 +10,7 @@ function output($output) {
     http://koders.com/php/fidB0434D36F01703F9ACAB5E21065E315FE44D2C57.aspx?s=xslt_process
     http://koders.com/php/fid78371B5F37DAE258E3258B91CC791A712CBF2AAC.aspx?s=xslt_process
     */
-    if (isset($_SESSION['variables']['extention']) and $_SESSION['variables']['extention'] == "html" and false) {
+    if (isset($_SESSION['variables']['extention']) and $_SESSION['variables']['extention'] == "html") {
         if (version_compare(phpversion(), "5.0", ">")) {
             $processor = new XSLTProcessor();
             
