@@ -1,0 +1,9 @@
+import module "libetat";
+
+(: Ausgabe erstellen :)
+<application> {
+
+  (: Ausgeben erzeugen :)
+  let $page := renderURL()
+  return loadPage($page[0], $page[1], subsequence($page, 2))
+} </application>

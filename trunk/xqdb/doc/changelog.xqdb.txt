@@ -1,0 +1,19 @@
+21.02.05
+  - Kommentare können nun in die Scripte eingefügt werden.
+  
+22.02.05
+  - Die Sql Funktion funktioniert jetzt.
+  
+23.02.05
+  - Output - Funktion eingefügt
+  - Session wird nun erstellt und überprüft
+  
+26.02.05
+  - Es ist nun Möglich auf Sessionvariablen zuzugreifen und diese zu verändern
+  - Die renderURL Funktion sollte nun implementiert sein
+  
+TODO
+ - Deletebefehl
+ - Benuzterverwalutn
+ - Rechteverwaltung
+ - Zugriffsrechte auf Funktionen

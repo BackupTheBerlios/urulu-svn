@@ -1,0 +1,5 @@
+(: Importiert das Menu file :)
+
+createDoc("db://menu.xml"),
+insert doc("./setup/menu.xml") into doc("db://menu.xml"),
+commit(doc("db://menu.xml"))

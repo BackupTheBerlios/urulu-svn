@@ -1,0 +1,39 @@
+module namespace cms="libetat";
+
+(: Andere Module einbinden :)
+import module "eintragen";
+import module "eintragen.familie";
+
+(: Externe Funktionen :)
+declare function header($header) external header;
+declare function renderURL() external renderURL;
+
+(: Ueberarbeitet das Menu :)
+declare function createMenuPath($menu, $path) {
+  if (exists($menu) and exists($path)) then
+    (replace $menu[@name = $path[0]]/current with "true", createMenuPath($menu/sub/*, subsequence($path, 1))
+    )
+  else ()
+};
+
+(: Funktion zum Laden der Navigation :)
+declare function loadNavigation($page) {
+  createMenuPath(doc("db://menu.xml"), tokenize($page, "/")),
+  <navigation>{ doc("db://menu.xml") }</navigation>,
+  rollback(doc("db://menu.xml"))
+};
+
+(: Hauptfunktion, die die Seite l㣴 :)
+declare function loadPage($page, $extention, $variables) {
+  loadNavigation($page),
+  if (exists(session()/extention)) then
+    replace session()/extention with $extention
+  else
+    insert <extention>{ $extention }</extention> into session()/extention,
+  commit(session()),
+  <body> {
+    if ($page = "eintragen") then body-eintragen($variables)
+    else if ($page = "eintragen/familie") then body-eintragen-familie($variables)
+    else ()
+  } </body>
+};

@@ -1,0 +1,117 @@
+<menu>
+	<page name="home" current="false">
+		<file>action.home.php</file>
+		<name>Startseite</name>
+		<title>Zur Startseite zurueckkehren</title>
+		<visible>true</visible>
+		<url>/home</url>
+	</page>
+	<page name="eintragen" current="true">
+		<file>action.eintragen.php</file>
+		<name>Eintragen</name>
+		<title>Mitglied eintragen</title>
+		<visible>true</visible>
+		<url>/eintragen</url>
+		<sub>
+			<page name="familie" current="true">
+				<file>action.eintragen.familie.add.php</file>
+				<name>Familie</name>
+				<title>Familie erstellen</title>
+				<visible>true</visible>
+				<url>/eintragen/familie</url>
+				<sub>
+					<page name="add" current="false">
+						<file>action.eintragen.familie.add.php</file>
+						<name>hinzufügen</name>
+						<title>Familie erstellen</title>
+						<visible>true</visible>
+						<url>/eintragen/familie/add</url>
+					</page>
+				</sub>
+			</page>
+			<page name="mitglied" current="false">
+				<file>action.eintragen.mitglied.php</file>
+				<name>Mitglied</name>
+				<title>Mitglied eintragen</title>
+				<visible>true</visible>
+				<url>/eintragen/mitglied</url>
+				<sub>
+					<page name="familie" current="false">
+						<file>action.eintragen.mitglied.familie.php</file>
+						<name>Familie wählen</name>
+						<title>Familie und Kontaktadresse auswählen</title>
+						<visible>true</visible>
+						<url>/eintragen/mitglied/familie</url>
+					</page>
+					<page name="data" current="false">
+						<file>action.eintragen.mitglied.data.php</file>
+						<name>Mitglieder Daten</name>
+						<title>Personifizierung des Mitglieds</title>
+						<visible>true</visible>
+						<url>/eintragen/mitglied/data</url>
+					</page>
+					<page name="funktion" current="false">
+						<file>action.eintragen.mitglied.funktion.php</file>
+						<name>Funktion zuweisen</name>
+						<title>Funktion in Organisation festlegen</title>
+						<visible>true</visible>
+						<url>/eintragen/mitglied/funktion</url>
+					</page>
+				</sub>
+			</page>
+		</sub>
+	</page>
+	<page name="login" current="false">
+		<file>action.login.php</file>
+		<name>Login</name>
+		<title>Am System anmelden</title>
+		<visible>false</visible>
+		<url>/login</url>
+	</page>
+	<page name="logout" current="false">
+		<file>action.logout.php</file>
+		<name>Logout</name>
+		<title>Am System abmelden</title>
+		<visible>false</visible>
+		<url>/logout</url>
+	</page>
+	<page name="search" current="false">
+		<file>search.php</file>
+		<name>Suchen</name>
+		<title>Standart suche</title>
+		<visible>false</visible>
+		<url>/search</url>
+		<sub>
+			<page name="advanced" current="false">
+				<file>search.advanced.php</file>
+				<name>Erweiterte Suche</name>
+				<title>Erweiterte Suche nach Mitgliedern</title>
+				<visible>false</visible>
+				<url>/search/advanced</url>
+			</page>
+		</sub>
+	</page>
+	<page name="impressum" current="false">
+		<file>impressum.home.php</file>
+		<name>Impressum</name>
+		<title>Impressum und weitere Informationen</title>
+		<visible>false</visible>
+		<url>/impressum</url>
+		<sub>
+			<page name="kontakt" current="false">
+				<file>impressum.kontakt.php</file>
+				<name>Kontakt Formular</name>
+				<title>Kontaktieren sie den Support</title>
+				<visible>false</visible>
+				<url>/impressum/kontakt</url>
+			</page>
+			<page name="privacy" current="false">
+				<file>impressum.privacy.php</file>
+				<name>Privacy Policy</name>
+				<title>Rechtlicher Ausschluss</title>
+				<visible>false</visible>
+				<url>/impressum/privacy</url>
+			</page>
+		</sub>
+	</page>
+</menu>
