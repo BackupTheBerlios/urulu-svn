@@ -86,7 +86,9 @@ function __compile($context, $source, $name) {
   }
 
   /* Hauptteil niederschreiben */
-  $fp = fopen($name, 'w');
+  if (($fp = @fopen($name, 'w')) == false) {
+    PEAR::raiseError("Die Datei '" . $name . "' kann nicht geöffnet werden!");
+  }
   fwrite($fp, $code['Main']);
   fclose($fp);
   chmod($name, 0777);

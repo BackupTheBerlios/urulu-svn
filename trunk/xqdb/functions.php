@@ -48,7 +48,7 @@ function __ls_r($path) {
   $files = array();
   $dir = dir($path);
   while (false !== ($file = $dir->read())) {
-    if ($file != "." and $file != "..") {
+    if ($file != "." and $file != ".." and $file != ".svn") {
       $files[] = $file;
     }
   }

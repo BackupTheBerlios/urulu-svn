@@ -2,8 +2,10 @@
 
 define("CODE_SEP", "\n");
 define("RUN_STATE", "debug");
-define("BIN_DIR", realpath(dirname(__FILE__)) . "/public_html/");
-define("BASE_DIR", realpath(dirname(__FILE__)) . "/");
+define("BIN_DIR", realpath("../public_html") . "/");
+define("BASE_DIR", realpath("../xqdb") . "/");
+
+$GLOBALS['XQDB_SOURCE_DIRS'] = array(realpath("../cms") . "/", realpath("../etat") . "/");
 
 $GLOBALS['XQDB_ALLOWED_VARIABLE'] = array("_POST", "_GET", "_SERVER");
 $GLOBALS['XQDB_ALLOWED_FUNCTIONS'] = array("trim", "header");
