@@ -26,16 +26,29 @@ function output($output) {
             :ATTENTION: eventuell werden die im XSL-File includeten Dateien falsch eingebunden*/
             $result = $processor->transformtoxml($xmlDom);
         } else {
-            /* PHP4 XSLT Prozessor, ist auch unter PHP5 erreichbar, nur langsamer */
-            $processor = xslt_create();
-            xslt_set_base($processor, "file://" . BIN_DIR . "xslt/");
-        	$processor_arguments = array('/_xml' => $output);
-        	/* Transformiert den Output */
-        	$result = xslt_process($xh, 'arg:/_xml', $this->xsltfile, NULL, $processor_arguments);
-        	if(!$result && xslt_errno($processor)>0){
-    			$result = sprintf("Kann XSLT Dokument nicht umarbeiten [%d]: %s", xslt_errno($processor), xslt_error($processor));
-    		}
-    		xslt_free($processor);
+					/* PHP4 XSLT Prozessor, ist auch unter PHP5 erreichbar, nur langsamer */
+					
+					/* XSL File auslesen und Content ueberschreiben */
+					$filename = "main.xsl";
+					$handle = fopen ($filename, "r");
+					$xsl_contents = fread ($handle, filesize ($filename));
+					fclose ($handle);
+					$xsl = sprintf($xsl_contents, 'content/eintragen.familie.add.xsl');
+					
+					/* Stylesheet uebergeben */
+					$processor_arguments = array(
+					'/_xsl' => $xsl
+					);
+					$processor = xslt_create();
+					xslt_set_encoding($processor, 'ISO-8859-1');
+					xslt_set_base($processor, "file://C:/_homepageprojekte/urulu/temp/");
+					
+					/* Transformiert den Output */
+					$result = xslt_process($processor, 'index.xml', 'arg:/_xsl' , NULL, $processor_arguments);
+					if(!$result && xslt_errno($processor)>0){
+						$result = sprintf("Kann XSLT Dokument nicht umarbeiten [%d]: %s", xslt_errno($processor), xslt_error($processor));
+					}
+					xslt_free($processor);
         }
         /* Gibt das HTML-Dokument aus */
         echo $result;
