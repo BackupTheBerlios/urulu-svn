@@ -73,18 +73,18 @@ class Compiler extends DocReader
     } else {
       $files = array('Module' => $this->infos['Value'],
                      'Functions' => array());
-      $defindedFunctions = array();
+      $declaredFunctions = array();
       foreach ($this->functions as $function) {
       	$files['Functions'][$function['Name']] = "<?PHP"
            . CODE_SEP . "\$GLOBALS['XQDB_Fkts']['" . $function['Name'] . "']='__userFN_" . $function['Name'] . "';"
            . $function['Body'] . CODE_SEP . "?>";
-        $defindedFunctions[] = CODE_SEP . "'" . $function['Name'] . "'=>BIN_DIR.'" . preg_replace("/\W/", "_", $this->infos['Value']) . "/" 
+        $declaredFunctions[] = CODE_SEP . "'" . $function['Name'] . "'=>BIN_DIR.'" . preg_replace("/\W/", "_", $this->infos['Value']) . "/" 
            . $function['Name'] . ".php'";
       }
       $files['Main'] = "<?PHP" . $moduleInclude;
-      if (isset($defindedFunctions[0])) {
-      	$files['Main'] .= CODE_SEP . "\$GLOBALS['XQDB_declFkts']=array_merge(\$GLOBALS['XQDB_Fkts'], array(" 
-      	   . implode(",", $defindedFunctions) . "));";
+      if (isset($declaredFunctions[0])) {
+      	$files['Main'] .= CODE_SEP . "\$GLOBALS['XQDB_declFkts']=array_merge(\$GLOBALS['XQDB_declFkts'], array(" 
+      	   . implode(",", $declaredFunctions) . "));";
       }
       $files['Main'] .= ($this->instructions ? CODE_SEP . $this->instructions : "") . CODE_SEP . "?>";
       return $files;
@@ -292,6 +292,7 @@ class Compiler extends DocReader
 
 	  /* Name suchen */
 	  $name = $this->qname("QName", true);
+	  $name['LocalPart'] = preg_replace("/-/", "_", $name['LocalPart']);
 	  $functionHead = CODE_SEP . "function __userFN_" . $name['LocalPart'] . "(\$context";
 	  $function = "";
 
@@ -969,7 +970,7 @@ class Compiler extends DocReader
     }
 
     /* Funktionsauf erstellen */
-    return CODE_SEP . "__functionCall('" . ($this->infos['Type'] == "Libary" ? $this->infos['Value'] : "" ) . "','" .  $name['LocalPart'] . "',"
+    return CODE_SEP . "__functionCall('" . ($this->infos['Type'] == "Libary" ? $this->infos['Value'] : "" ) . "','" .  preg_replace("/-/", "_", $name['LocalPart']) . "',"
         . $context . (isset($args[0]) ? "," . implode(",", $args) : "") . ")";
   }
  

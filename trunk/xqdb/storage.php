@@ -362,7 +362,7 @@ class Storage
       foreach ($this->cache[$id]->axis("child") as $key => $child) {
       	$this->insertItem($child, $parent, ( $order > 0 ? $order + $key : $order ));
       }
-    
+
     /* Attribute einfügen */
     } elseif (get_class($this->cache[$id]->properties()) == "attribute") {
 
@@ -376,9 +376,19 @@ class Storage
     
     /* Andere Knoten einfügen */
     } else {
-    
-      /* Vaterelement updaten */
+
+      /* Kinderelemente festlegen */
       $children = $this->cache[$parent]->axis("child");
+
+      /* Ort bestimmen, an dem das Item eingefügt werden soll */
+      while ($order < 0) {
+        $order += count($children) + 1;
+      }
+      if ($order > count($children)) {
+      	$order = $order % (count($children) + 1);
+      }      
+      
+      /* Vaterelement updaten */
       array_splice($children, intval($order), 0, $id);
       $this->cache[$parent]->updateAxis("child", $children);
       
@@ -578,22 +588,61 @@ class Storage
      string $uri: URI des Dokuments, das gespeichert werden soll
    */
   function commit($uri) {
-    $encodedURI = $this->encodeURI($uri);
-    
+
     /* Überprüfen ob das Dokument existiert */
-    if (isset($this->doc[$encodedURI['Storage'] . "://" . $encodedURI['URI']]) == false) {
+    $properties = $this->cache[$uri]->properties();
+    if (isset($this->doc[$this->cache[$uri]->storage() . "://" . $properties->documentURI]) == false) {
     	PEAR::raiseError("Es existiert kein Dokument mit dem URI '" . $uri . "'!");
-    }
+    }    
     
     /* Knoten Registrieren */
     foreach ($this->changelog as $id => $item) {
-    	if ($this->cache[$id]->storage() == $encodedURI['Storage'] 
-    	    and $this->cache[$id]->uri() == $this->cache[$this->doc[$encodedURI['Storage'] . "://" . $encodedURI['URI']]]->uri()) {
+    	if ($this->cache[$id]->storage() == $this->cache[$uri]->storage() and $this->cache[$id]->uri() == $this->cache[$uri]->uri()) {
        	switch ($this->cache[$id]->storage()) {
   
        	  /* Dokumente, die aus PHPariablen erstellt wurden */
        	  case "php":
-       	  
+       	    
+       	    /* Vorfahren der Variablen suchen */
+       	    $ancestor = $this->axis($id, "ancestor");
+       	    
+       	    /* Zeil bestimmen */
+       	    $parts = explode("/", $this->cache[$id]->uri());
+       	    $target =& $GLOBALS[$parts[0]];
+       	    foreach (array_slice($parts, 1) as $step) {
+       	    	$target =& $target[$step];
+       	    }
+
+       	    /* Varerelemente laden */
+       	    foreach ($ancestor as $node) {
+              if ($this->cache[$node]->type() == "element") {
+                $properties = $this->cache[$node]->properties();
+                $target =& $target[$properties->nodeName];
+              }
+            }
+            
+            /* Falls der Ast nicht existiert, Fehler ausgeben */
+            if ($target === null) {
+              PEAR::raiseError("Commit fehlgeschalgaen");
+            }
+
+       	    /* Aktion ausführen */
+            $properties = $this->cache[$id]->properties();
+       	    if ($item['Action'] == "insert") {
+       	      switch ($this->cache[$id]->type()) {
+                case "element":
+                  $target[$properties->nodeName] = array();
+                break;
+                case "text":
+                  $target = $properties->content;
+                break;
+                case "atomicvalue":
+                  $target = $properties->value;
+                break;
+       	      }
+       	    } elseif ($this->cache[$id]->type() == "atomicvalue") {
+              $target = $properties->value;
+            }
        	  break;
        	  
       	  /* Dokumente, die in der Datenbank gespeichert sind */
@@ -742,19 +791,19 @@ class Storage
   function rollback($uri) {
 
     /* Temporäre Knoten können nicht zurückgesetzt werden! */
-    if ($this->cache[$uri]->stroage() != "db") {
+    if ($this->cache[$uri]->storage() != "db") {
     	PEAR::raiseError("Nur Dokumente in der Datenbank können zurückgesetzt werden!");
     }
     
     /* Überprüfen ob das Dokument existiert */
-    if (isset($this->doc[$this->cache[$uri]->stroage() . "://" . $this->cache[$uri]->uri()]) == false) {
+    $properties = $this->cache[$uri]->properties();
+    if (isset($this->doc[$this->cache[$uri]->storage() . "://" . $properties->documentURI]) == false) {
     	PEAR::raiseError("Es existiert kein Dokument mit dem URI '" . $uri . "'!");
     }
     
     /* Knoten Unregistrieren */
     foreach ($this->changelog as $id => $item) {
-    	if ($this->cache[$id]->storage() == $this->cache[$uri]->stroage()
-    	    and $this->cache[$id]->uri() == $this->cache[$this->doc[$this->cache[$uri]->stroage() . "://" . $this->cache[$uri]->uri()]]->uri()) {
+    	if ($this->cache[$id]->storage() == $this->cache[$uri]->storage() and $this->cache[$id]->uri() == $this->cache[$uri]->uri()) {
     		unset($this->changelog[$id]);
     		$this->cache[$id]->rollback();
     	}

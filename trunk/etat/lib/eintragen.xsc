@@ -1,1 +1,5 @@
 module namespace cms="eintragen";
+
+declare function body-eintragen($variables) {
+  <action type="eintragen" />
+};

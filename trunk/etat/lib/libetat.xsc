@@ -23,13 +23,13 @@ declare function loadNavigation($page) {
   rollback(doc("db://menu.xml"))
 };
 
-(: Hauptfunktion, die die Seite l㣴 :)
+(: Hauptfunktion, die die Seite lD :)
 declare function loadPage($page, $extention, $variables) {
   loadNavigation($page),
   if (exists(session()/extention)) then
     replace session()/extention with $extention
   else
-    insert <extention>{ $extention }</extention> into session()/extention,
+    insert <extention>{ $extention }</extention> into session(),
   commit(session()),
   <body> {
     if ($page = "eintragen") then body-eintragen($variables)
