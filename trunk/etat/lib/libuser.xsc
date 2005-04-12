@@ -15,3 +15,19 @@ declare function dropUser($name) {
   else
     <error>{"Der Benutzer '", $name, "' existiert nicht!"}</error>
 };
+
+(: Rolle erstellen :)
+declare function createRole($name) {
+  if (count(sql("role_exist", $name)/*) > 0) then
+    <error>{"Die Rolle '", $name, "' existiert bereits!"}</error>
+  else
+    sql("role_insert", $name)
+};
+
+(: Rolle loeschen :)
+declare function dropRole($name) {
+  if (count(sql("role_exist", $name)) > 0) then
+    sql("role_drop", $name)
+  else
+    <error>{"Die Rolle '", $name, "' existiert nicht!"}</error>
+};
