@@ -31,3 +31,15 @@ declare function dropRole($name) {
   else
     <error>{"Die Rolle '", $name, "' existiert nicht!"}</error>
 };
+
+(: Benuzter einlogen :)
+declare function binLogin($name) external binLogin;
+declare function login($name, $password) {
+  if (count(sql("login", ($name, $password))) = 0) then
+    <error>Der übergebene Benuztername oder das übergebene Passwort ist falsch!</error>
+  else
+    binLogin($name)
+};
+
+(: Logout :)
+declare function logout() external logout;

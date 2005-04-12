@@ -56,6 +56,8 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
   'role_exist' => array("SELECT * FROM role WHERE name='?'", 1),
   'role_drop' => array("DELETE FROM role WHERE name='?'", 1),
   
+  'get_role_by_user' => array("SELECT role.* FROM role, userrole, user WHERE role.id=userrole.rid AND userrole.uid=user.id AND user.name='?'", 1),
+  'login' => array("SELECT * FROM user WHERE name='?' AND passwd=md5(CONCAT(md5('?'), md5('Urulu-Secutrity-Pat')))", 2),
 /*
    Queries zur Verwaltung der Sessions
  */

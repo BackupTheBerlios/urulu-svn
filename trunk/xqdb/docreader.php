@@ -245,7 +245,8 @@ class DocReader extends Parser
         
       /* Normaler Text */ 
       } else {
-        for ($loop = $this->position; isset($this->query[$loop + 1]) and $this->query[$loop] != "<"; $loop++);
+        for ($loop = $this->position; isset($this->query[$loop + 1]) and $this->query[$loop] != "<" and ($this->query[$loop] != "{" 
+            or (isset($this->query[$loop + 1]) and $this->query[$loop + 1] == "{") or ($this->query[$loop - 1] == "{")); $loop++);
         $text = preg_replace(array('/""/', "/''/", "/&lt;/", "/&gt;/", "/&amp;/", "/&quot;/", "/&apos;/"),
             array('"', "'", "<", ">", "&", '"', "'"), substr($this->query, $this->position, $loop - $this->position));
         if (strpos($text, "&") !== false) {

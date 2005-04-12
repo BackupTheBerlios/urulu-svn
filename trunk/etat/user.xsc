@@ -12,14 +12,30 @@ import module "libuser";
   <action> 
     Rolle Erstellen
     {(: Rolle anlegen :)
-      createRole("test")
+      createRole("test"),
+      createRole("test1")
     } 
   </action>
   
+  <action> 
+    Benuzter anmelden
+    {(: Rolle anlegen :)
+      login("test", "test")
+    } 
+  </action>
+
+  <action> 
+    Benuzter abmelden
+    {(: Rolle anlegen :)
+      logout()
+    } 
+  </action>
+
   <action>
     Rolle wieder loeschen
     {(: Rolle wieder loeschen :)
-      dropRole("test")
+      dropRole("test"),
+      dropRole("test1")
     }
   </action>
 
@@ -29,5 +45,4 @@ import module "libuser";
       dropUser("test")
     }
   </action>
-  
 </application>
