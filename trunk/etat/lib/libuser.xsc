@@ -2,13 +2,13 @@ module namespace cms="libuser";
 
 (: Benuzter erstellen :)
 declare function createUser($name, $password, $email) {
-  if (count(sql("user_exist", $name)) > 0) then
+  if (count(sql("user_exist", $name)/*) > 0) then
     <error>{"Der Benutzer '", $name, "' existiert bereits!"}</error>
   else
     sql("user_insert", ($name, $password, $email))
 };
 
-(: Benuzter löschen :)
+(: Benuzter loeschen :)
 declare function dropUser($name) {
   if (count(sql("user_exist", $name)) > 0) then
     sql("user_drop", $name)

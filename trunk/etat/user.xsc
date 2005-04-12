@@ -1,0 +1,18 @@
+import module "libuser";
+
+(: Ausgabe erstellen :)
+<application>
+  Benuzter Erstellen:
+  <action> 
+    {(: Benuzter anlegen :)
+      createUser("test", "test", "test@test.com")
+    } 
+  </action>
+  
+  Benuzter wieder loeschen
+  <action>
+    {(: Benuzter wieder loeschen :)
+      dropUser("test")
+    }
+  </action>
+</application>
