@@ -1,6 +1,7 @@
 <?PHP
 
 define("CODE_SEP", "\n");
+define("IS_XSLT", true);
 define("RUN_STATE", "debug");
 define("BIN_DIR", realpath("../public_html") . "/");
 define("BASE_DIR", realpath("../xqdb") . "/");
