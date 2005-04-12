@@ -342,9 +342,16 @@ class Compiler extends DocReader
 	}
 
   /* Token: EnclosedExpr */
-  // EnclosedExpr ::= "{" Expr "}"
+  // EnclosedExpr ::= "{" Expr? "}"
 	function enclosedExpr() {
 	  $this->string("{", true);
+	  
+	  /* Leere Expression */
+	  if ($this->string("}")) {
+	  	return "array()";
+	  }
+	  
+	  /* Nichtleere expression */
     $expr = $this->expr();
 	  $this->string("}", true);
 	  return $expr;

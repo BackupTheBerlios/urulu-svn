@@ -69,7 +69,7 @@ function __tokenize($context, $input, $pattern) {
  */
 // fn:count($arg as item()*) as xs:integer
 function __count($context, $arg) {
-  return array(count($arg));
+  return array($GLOBALS['XQDB_Storage']->registerItem(new AtomicValue(count($arg), "xs:integer")));
 }
 
 /* Gibt die Position des Items in der Sequenz zurück

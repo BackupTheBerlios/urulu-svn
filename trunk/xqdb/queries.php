@@ -48,9 +48,13 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
 /*
    Queries zur Benuzterverwalutng
  */
-  'user_insert' => array("INSERT INTO user (name, passwd, email) VALUES ('?', '?', '?')", 3),
+  'user_insert' => array("INSERT INTO user (name, passwd, email) VALUES ('?', md5(CONCAT(md5('?'), md5('Urulu-Secutrity-Pat'))), '?')", 3),
   'user_exist' => array("SELECT * FROM user WHERE name='?'", 1),
   'user_drop' => array("DELETE FROM user WHERE name='?'", 1),
+
+  'role_insert' => array("INSERT INTO role (name) VALUES ('?')", 1),
+  'role_exist' => array("SELECT * FROM role WHERE name='?'", 1),
+  'role_drop' => array("DELETE FROM role WHERE name='?'", 1),
   
 /*
    Queries zur Verwaltung der Sessions

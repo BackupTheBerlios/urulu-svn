@@ -17,10 +17,10 @@ function __sql($context, $query, $params = array()) {
   $result = __executeSQL(__toString($query), $paramsStr, true);
   
   /* Dokument mit den Lösungen erstellen */
-  $document = $GLOBALS['XQDB_Storage']->createDoc("tmp://null");
+  $document = $GLOBALS['XQDB_Storage']->createDoc("tmp://" . md5(uniqid(microtime()) . rand()));
   foreach ($result as $key => $tupel) {
     $element = $GLOBALS['XQDB_Storage']->registerItem(new Element("tupel_" . $key));
-    $GLOBALS['XQDB_Storage']->insertItem($element, $document);
+    $GLOBALS['XQDB_Storage']->insertItem($element, $document[0]);
     foreach ($tupel as $name => $value) {
       $id = $GLOBALS['XQDB_Storage']->registerItem(new Element($name));
       $GLOBALS['XQDB_Storage']->insertItem($id, $element);

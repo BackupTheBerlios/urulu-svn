@@ -842,6 +842,11 @@ class Storage
       case "document": 
       break;
       
+      /* Einzelne Werte */
+      case "atomicvalue":
+        $xml .= $item->value;
+      break;
+      
       /* Element-Knoten */
       case "element":
         $xml .= "<" . $item->toXML();

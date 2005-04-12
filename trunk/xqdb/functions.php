@@ -26,7 +26,7 @@ function &__executeSQL($query, $params = array(), $return = false) {
   $rs =& $GLOBALS['XQDB_DB']->query($realQuery);
   if (DB::isError($rs)) {
     PEAR::raiseError("Datenbankfehler: " . $rs->getMessage());
-  } elseif ($return) {
+  } elseif ($return and is_object($rs) and get_class($rs) == "db_result") {
     $result = array();
     $tupel  = null;
     while ($rs->fetchInto($tupel)) {
