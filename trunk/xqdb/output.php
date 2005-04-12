@@ -29,12 +29,13 @@ function output($output) {
 					/* PHP4 XSLT Prozessor, ist auch unter PHP5 erreichbar, nur langsamer */
 					
 					/* XSL File auslesen und Content ueberschreiben */
-					$filename = "main.xsl";
+					$filename = "xslt/main.xsl";
 					$handle = fopen ($filename, "r");
 					$xsl_contents = fread ($handle, filesize ($filename));
 					fclose ($handle);
 					/* :TODO: Anpassen des xsc fuer die Uebergabe des Templatefiles */
-					$xsl = sprintf($xsl_contents, $_SESSION['variables']['template_content']);
+					// $xsl = sprintf($xsl_contents, $_SESSION['variables']['template_content']);
+					$xsl = $xsl_contents;
 					
 					/* Stylesheet uebergeben */
 					$processor_arguments = array(
