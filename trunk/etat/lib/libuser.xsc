@@ -43,3 +43,30 @@ declare function login($name, $password) {
 
 (: Logout :)
 declare function logout() external logout;
+
+(: Aktulle Benutzer zurückgeben :)
+declare function getCurrentUser() external getCurrentUser;
+
+(: Benuzter zu einer Rolle hinzufügen :)
+declare function addUserToRole($user, $role) {
+  if (count(sql("user_exist", $user)) = 0 or count(sql("role_exist", $role)) = 0) then
+    <error>Der übergebene Benuzter oder die übergebene Rolle existiert nicht!</error>
+  else
+    sql("add_user_to_role", ($user, $role))
+};
+
+(: Benuzter von einer Rolle entfernen :)
+declare function removeUserFromRole($user, $role) {
+  let $uid := sql("user_exist", $user),
+  let $rid := sql("role_exist", $role)
+  return
+    if (count($uid) = 0 or count($rid) = 0 or count(sql("is_role_for_user", $user, $role)) = 0) then
+      <error>Der Benutzer '{$user}' gehöhrt nicht zur Rolle '{$role}'!</error>
+    else
+      sql("remove_user_from_role", ($uid/*[0]/id, $rid/*[0]/id))
+};
+
+(: Rollen eines Benztzers anzeigen :)
+declare function showUsersRoles($user) {
+  sql("get_roles_for_user", $user)/*/name
+};

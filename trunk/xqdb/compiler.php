@@ -410,9 +410,9 @@ class Compiler extends DocReader
 	  
 	  /* for und let klauseln auswerten */
 	  while ($this->string("for", false, false) or $this->string("let", false, false)) {
-      if ($this->string("for")) {
+      if ($this->string("for", false, false)) {
         $expr .= $this->forClause($scopes, $context);
-      } elseif ($this->string("let", true)) {
+      } elseif ($this->string("let", true, false)) {
         $expr .= $this->letClause($context);
       }
 	  }
@@ -425,15 +425,19 @@ class Compiler extends DocReader
 
     /* Return-Expr */
     $this->string("return", true);
-    $expr .= CODE_SEP . "\$x" . substr($hash, 0, 5) . "=array_merge(\$x" . substr($hash, 0, 5) . "," . $this->exprSingle("array()") . ")";
+    $expr .= CODE_SEP . "\$x" . substr($hash, 0, 5) . "=array_merge(\$x" . substr($hash, 0, 5) . "," . $this->exprSingle("array()") . ");";
     
     /* Klammern schliessen */
-    for (; $scopes > 0; $scopes --) {
-      $expr .= CODE_SEP . "}";
+    if ($scopes > 0) {
+      for (; $scopes > 0; $scopes --) {
+        $expr .= CODE_SEP . "}";
+      }
+    } else {
+      $expr .= ";";
     }
 
     /* Funktion erstellen */
-    $this->instructions .= CODE_SEP . "function __autoFN_" . $hash . "(){" . $expr . ";" . CODE_SEP . "return \$x" . substr($hash, 0, 5) . ";" . CODE_SEP . "}";
+    $this->instructions .= CODE_SEP . "function __autoFN_" . $hash . "(){" . $expr . CODE_SEP . "return \$x" . substr($hash, 0, 5) . ";" . CODE_SEP . "}";
     
     /* Item erstellen und zurückgeben */
  	  $this->variables = $variables;
@@ -446,6 +450,9 @@ class Compiler extends DocReader
 	  $for = "";
 	  
 	  do {
+	    /* String entsorgen */
+	    $this->string("for", true);
+	    
 	    /* am Schluss muss eine Klammer mehr zugemacht werden. */
 	    $scopes ++;
 	    
@@ -456,7 +463,7 @@ class Compiler extends DocReader
       
       /* Schleife erstellen */
       $this->variables[$name['LocalPart']] = "\$GLOBALS['__userVAR_" . $name['LocalPart'] . "']";
-      $variable = "\$x" . substr(md5(uniqid(microtime()) . rand()), 0, 5) . "=array();";
+      $variable = "\$x" . substr(md5(uniqid(microtime()) . rand()), 0, 5);
       $for .= CODE_SEP . "foreach (" . $this->exprSingle($context) . " as " . $variable . ") {"
            .  CODE_SEP . "\$GLOBALS['__userVAR_" . $name['LocalPart'] . "']=" . $variable . ";";
 	  } while ($this->string(","));
@@ -471,6 +478,7 @@ class Compiler extends DocReader
 	  $let = "";
 	  do {
 	    /* Variable finden */
+	    $this->string("let", true);
       $this->string("$", true);
       $name = $this->qname("QName", true);
       $this->string(":=", true);
@@ -535,10 +543,9 @@ class Compiler extends DocReader
   /* Token: OrExpr */
   // OrExpr ::=  AndExpr ( "or" AndExpr )*
 	function orExpr($context) {
-	  return $this->andExpr($context);
+	  $arg1 = $this->andExpr($context);
     if ($this->string("or")) {
-      $arg2 = $this->andExpr();
-      return "__token_or(" . $arg1 . "," . $arg2 . ")";
+      return "__orExpr(" . $arg1 . "," . $this->orExpr($context) . ")";
     } else {
       return $arg1;
     }
@@ -549,7 +556,7 @@ class Compiler extends DocReader
 	function andExpr($context) {
 	  $arg1 = $this->comparisonExpr($context);
     if ($this->string("and")) {
-      return "__andExpr(" . $arg1 . "," . $this->comparisonExpr($context) . ")";
+      return "__andExpr(" . $arg1 . "," . $this->andExpr($context) . ")";
     } else {
       return $arg1;
     }

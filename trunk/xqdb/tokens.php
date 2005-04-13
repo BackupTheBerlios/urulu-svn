@@ -206,6 +206,19 @@ function __andExpr($arg1, $arg2) {
   }
 }
 
+/* Boolsches-oder
+   string[] $arg1: Erstes Argument
+   string[] $arg2: Zeites Argument
+   string[] return Boolscher Wert mit dem Ergebnis der Abfrage
+ */
+function __orExpr($arg1, $arg2) {
+  if (__toBoolean($arg1) or __toBoolean($arg2)) {
+  	return $GLOBALS['XQDB_Storage']->boolTrue(); 
+  } else {
+    return $GLOBALS['XQDB_Storage']->boolFalse();
+  }
+}
+
 /* Führt einen IF-Ausdruck aus
    bool $condition: Abfrage des IF-Ausdrucks
    string[] $true: Ausgabe falls $condition wahr ist

@@ -4,45 +4,50 @@ import module "libuser";
 <application>
   <action> 
     Benuzter Erstellen
-    {(: Benuzter anlegen :)
-      createUser("test", "test", "test@test.com")
-    } 
+    { createUser("test", "test", "test@test.com") } 
   </action>
   
   <action> 
     Rolle Erstellen
-    {(: Rolle anlegen :)
-      createRole("test"),
-      createRole("test1")
-    } 
+    { createRole("test"),
+      createRole("test1") } 
   </action>
   
   <action> 
+    Benuzter zur Rolle hinzufügen
+    { addUserToRole("test", "test"),
+      addUserToRole("test", "test1") } 
+  </action>
+
+  <action> 
+    Rollen des Benuzter anzeigen:
+    { showUsersRoles("test") } 
+  </action>
+
+  <action> 
+    Benuzter aus Rollen entfernen
+    { for $roles in showUsersRoles("test")
+      return removeUserFromRole("test", $roles) } 
+  </action>
+
+  <action> 
     Benuzter anmelden
-    {(: Rolle anlegen :)
-      login("test", "test")
-    } 
+    { login("test", "test") } 
   </action>
 
   <action> 
     Benuzter abmelden
-    {(: Rolle anlegen :)
-      logout()
-    } 
+    { logout() } 
   </action>
 
   <action>
     Rolle wieder loeschen
-    {(: Rolle wieder loeschen :)
-      dropRole("test"),
-      dropRole("test1")
-    }
+    { dropRole("test"),
+      dropRole("test1") }
   </action>
 
   <action>
     Benuzter wieder loeschen
-    {(: Benuzter wieder loeschen :)
-      dropUser("test")
-    }
+    { dropUser("test") }
   </action>
 </application>

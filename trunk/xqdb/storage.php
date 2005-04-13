@@ -721,6 +721,7 @@ class Storage
             	      __executeSQL("create_attribute", array($this->cache[$id]->uri()));
             	      __executeSQL("create_text", array($this->cache[$id]->uri()));
             	      __executeSQL("create_comment", array($this->cache[$id]->uri()));
+            	      __executeSQL("create_access", array($this->cache[$id]->uri()));
             	      __executeSQL("create_index_attribute", array($this->cache[$id]->uri()));
             	      __executeSQL("create_index_child", array($this->cache[$id]->uri()));
             	      __executeSQL("create_index_descendant", array($this->cache[$id]->uri()));

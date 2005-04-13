@@ -58,6 +58,12 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
   
   'get_role_by_user' => array("SELECT role.* FROM role, userrole, user WHERE role.id=userrole.rid AND userrole.uid=user.id AND user.name='?'", 1),
   'login' => array("SELECT * FROM user WHERE name='?' AND passwd=md5(CONCAT(md5('?'), md5('Urulu-Secutrity-Pat')))", 2),
+  
+  'add_user_to_role' => array("INSERT INTO userrole (uid, rid) SELECT user.id, role.id FROM user, role WHERE user.name='?' AND role.name='?'", 2),
+  'is_role_for_user' => array("SELECT userrole.* FROM userrole, user, role WHERE userrole.uid=user.id AND user.name='?' AND userrole.rid=role.id AND role.name='?'", 2),
+  'get_roles_for_user' => array("SELECT userrole.* FROM userrole, user WHERE userrole.uid=user.id AND user.name='?'", 1),
+  'remove_user_from_role' => array("DELETE FROM userrole SELECT uid='?' AND rid='?'", 2),
+
 /*
    Queries zur Verwaltung der Sessions
  */
@@ -117,6 +123,19 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
     parentType ENUM('document', 'element') NOT NULL,
     PRIMARY KEY  (id),
     KEY comment (content(10))
+  ) TYPE=MyISAM AUTO_INCREMENT=1", 1),
+/* Erstellt die Tabelle mit den Kommentaren */
+  'create_access' => array("CREATE TABLE ?_access (
+    id VARCHAR(32) NOT NULL default '',
+    parent VARCHAR(32) NOT NULL default 0,
+    action ENUM('select', 'insert', 'update', 'rename') NOT NULL,
+    node ENUM('element', 'attribute', 'text', 'comment', 'node', 'item') NOT NULL,
+    role INT(11) NOT NULL default 0,
+    type ENUM('execute', 'grant') NOT NULL,
+    instance VARCHAR(32) NOT NULL default '*',
+    descendant INT(11) NOT NULL default 0
+    PRIMARY KEY  (id),
+    KEY action (role, action)
   ) TYPE=MyISAM AUTO_INCREMENT=1", 1),
 /* Erstellt die Tabelle für die Attribute */
   'create_index_attribute' => array("CREATE TABLE ?_index_attribute (
