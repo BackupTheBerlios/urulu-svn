@@ -147,4 +147,31 @@ function __rollback($context, $uri) {
 function __session($context) {
   return __importPHPVar($_SESSION['variables'], "_SESSION/variables", -2);
 }
+
+
+/* Setzt ein Zugriffsrecht auf einen Knoten
+   string[] $target: Knoten auf den das Zugriffsrecht gesetzt werden soll
+   string[] $role: Rolle für die das Recht gelten soll
+   string[] $action: Aktion, für die das Zugriffsrecht gelten soll. Folgende Rechte sind erlaubt: "select", "insert", "update", "rename"
+   string[] $node: Welche Knotentypen sollen vom Zugriffsrecht betroffen sein. Folgende Knotentypen sind erlaubt: "element", "attribute", "text", "comment". 
+            Mit der Angabe "node" sind nur Element-, Text-, und Kommentarknoten erlaubt. Mit der Angabe "item" sind alle Knoten betroffen
+   string[] $type: Type des Rechtes, folgende Werte sind erlaubt: "execute", "grant"
+   string[] $instance: Name der Instanz die Betroffen ist. Dieser Wert hat nur Auswirkungen, wenn $node auf "element" gesetzt ist. Folgende werte sind erlaubt: "*", qName
+   string[] $descendant: Auf wieviele Hierarchiestufen Abwärts soll das recht gelten? Folgede Werte sind zugelassen: "inf", int
+ */
+function __grant($target, $role, $action = null, $node = null, $instance = null, $descendant = null) {
+
+//$action = "select", $node = "item", $type = "execute", $instance = "*", $descendant = "int"
+
+
+}
+
+/* Entfernt ein Zugriffsrecht von einem Knoten
+   string[] $target: Knoten von dem das Recht entfernt werden soll
+   string[] $role: Rolle für die das Zugriffsrecht entfernt werden soll
+ */
+function __revoke($target, $role) {
+  
+  
+}
 ?>

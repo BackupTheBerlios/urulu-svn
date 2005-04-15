@@ -10,9 +10,16 @@ declare function createUser($name, $password, $email) {
 
 (: Benuzter loeschen :)
 declare function dropUser($name) {
-  if (count(sql("user_exist", $name)) > 0) then
+  if (count(sql("user_exist", $name)) > 0) then (
+    
+    (: Auch zuordnungen des Benutzers löschen :)
+    for $role in showUsersRoles($name)
+      return removeUserFromRole($name, $role),
+      
+    (: Benuzter löschen :)
     sql("user_drop", $name)
-  else
+    
+  ) else
     <error>{"Der Benutzer '", $name, "' existiert nicht!"}</error>
 };
 
@@ -26,9 +33,16 @@ declare function createRole($name) {
 
 (: Rolle loeschen :)
 declare function dropRole($name) {
-  if (count(sql("role_exist", $name)) > 0) then
+  if (count(sql("role_exist", $name)) > 0) then (
+    
+    (: Bein löschen der Rolle auch zuordnungen löschen :)
+    for $user in showRolesUsers($name)
+      return removeUserFromRole($user, $name),
+    
+    (: Rolle löschen :)
     sql("role_drop", $name)
-  else
+
+  ) else
     <error>{"Die Rolle '", $name, "' existiert nicht!"}</error>
 };
 
@@ -60,7 +74,7 @@ declare function removeUserFromRole($user, $role) {
   let $uid := sql("user_exist", $user),
   let $rid := sql("role_exist", $role)
   return
-    if (count($uid) = 0 or count($rid) = 0 or count(sql("is_role_for_user", $user, $role)) = 0) then
+    if (count($uid) = 0 or count($rid) = 0 or count(sql("is_role_for_user", ($user, $role))) = 0) then
       <error>Der Benutzer '{$user}' gehöhrt nicht zur Rolle '{$role}'!</error>
     else
       sql("remove_user_from_role", ($uid/*[0]/id, $rid/*[0]/id))
@@ -68,5 +82,10 @@ declare function removeUserFromRole($user, $role) {
 
 (: Rollen eines Benztzers anzeigen :)
 declare function showUsersRoles($user) {
-  sql("get_roles_for_user", $user)/*/name
+  sql("get_roles_for_user", $user)/*/name/text()
+};
+
+(: Rollen eines Benztzers anzeigen :)
+declare function showRolesUsers($user) {
+  sql("get_users_for_role", $user)/*/name/text()
 };

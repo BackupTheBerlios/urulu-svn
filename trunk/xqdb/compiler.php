@@ -465,7 +465,7 @@ class Compiler extends DocReader
       $this->variables[$name['LocalPart']] = "\$GLOBALS['__userVAR_" . $name['LocalPart'] . "']";
       $variable = "\$x" . substr(md5(uniqid(microtime()) . rand()), 0, 5);
       $for .= CODE_SEP . "foreach (" . $this->exprSingle($context) . " as " . $variable . ") {"
-           .  CODE_SEP . "\$GLOBALS['__userVAR_" . $name['LocalPart'] . "']=" . $variable . ";";
+           .  CODE_SEP . "\$GLOBALS['__userVAR_" . $name['LocalPart'] . "']=array(" . $variable . ");";
 	  } while ($this->string(","));
 	  
 	  /* Aufrufe zurückgeben */
@@ -993,9 +993,11 @@ class Compiler extends DocReader
   //                   | ComputedConstructor
   function constructor($type) {
     if ($type == "direct") {
+      $root = $this->root;
     	$fnName = "__autoFN_" . md5(uniqid(microtime()) . rand()) . "()";
       $this->instructions .= CODE_SEP . "function " . $fnName . " {" 
                           .  $this->directConstructor() .  CODE_SEP . "return array(" . $this->root . ");" . CODE_SEP . "}";
+      $this->root = $root;
     	return CODE_SEP . $fnName;
     } else {
     	return $this->computedConstructor();

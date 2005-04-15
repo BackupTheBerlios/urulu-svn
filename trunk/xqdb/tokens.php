@@ -93,7 +93,7 @@ function __replace($source, $dest) {
   /* Knoten ersetzen */
   if (count($dest) > 0) {
     foreach ($dest as $item) {
-      $GLOBALS['XQDB_Storage']->update($item, $destItem);
+      $GLOBALS['XQDB_Storage']->update($item, $source[0]);
     }
   }
   return array();

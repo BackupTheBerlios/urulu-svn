@@ -61,8 +61,9 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
   
   'add_user_to_role' => array("INSERT INTO userrole (uid, rid) SELECT user.id, role.id FROM user, role WHERE user.name='?' AND role.name='?'", 2),
   'is_role_for_user' => array("SELECT userrole.* FROM userrole, user, role WHERE userrole.uid=user.id AND user.name='?' AND userrole.rid=role.id AND role.name='?'", 2),
-  'get_roles_for_user' => array("SELECT userrole.* FROM userrole, user WHERE userrole.uid=user.id AND user.name='?'", 1),
-  'remove_user_from_role' => array("DELETE FROM userrole SELECT uid='?' AND rid='?'", 2),
+  'get_roles_for_user' => array("SELECT role.* FROM userrole, user, role WHERE userrole.uid=user.id AND user.name='?' AND role.id=userrole.rid", 1),
+  'get_users_for_role' => array("SELECT user.* FROM userrole, user, role WHERE userrole.uid=user.id AND role.name='?' AND role.id=userrole.rid", 1),
+  'remove_user_from_role' => array("DELETE FROM userrole WHERE uid='?' AND rid='?'", 2),
 
 /*
    Queries zur Verwaltung der Sessions

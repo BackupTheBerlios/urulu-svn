@@ -4,7 +4,8 @@ import module "libuser";
 <application>
   <action> 
     Benuzter Erstellen
-    { createUser("test", "test", "test@test.com") } 
+    { createUser("test", "test", "test@test.com"),
+      createUser("test2", "test2", "test2@test.com") } 
   </action>
   
   <action> 
@@ -16,18 +17,26 @@ import module "libuser";
   <action> 
     Benuzter zur Rolle hinzufügen
     { addUserToRole("test", "test"),
-      addUserToRole("test", "test1") } 
+      addUserToRole("test", "test1"),
+      addUserToRole("test2", "test1") } 
   </action>
 
   <action> 
-    Rollen des Benuzter anzeigen:
-    { showUsersRoles("test") } 
+    Rollen des Benuzters "test" anzeigen:
+    { for $roles in showUsersRoles("test") 
+      return <user>{$roles}</user> } 
+  </action>
+  
+  <action> 
+    Benutzer der Rolle "test1" anzeigen:
+    { for $user in showRolesUsers("test1") 
+      return <role>{$user}</role> } 
   </action>
 
   <action> 
     Benuzter aus Rollen entfernen
     { for $roles in showUsersRoles("test")
-      return removeUserFromRole("test", $roles) } 
+      return removeUserFromRole("test", $roles) }
   </action>
 
   <action> 
@@ -41,13 +50,14 @@ import module "libuser";
   </action>
 
   <action>
-    Rolle wieder loeschen
+    Rollen wieder loeschen
     { dropRole("test"),
       dropRole("test1") }
   </action>
 
   <action>
     Benuzter wieder loeschen
-    { dropUser("test") }
+    { dropUser("test"),
+      dropUser("test2") }
   </action>
 </application>

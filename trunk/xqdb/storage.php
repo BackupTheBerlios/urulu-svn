@@ -65,7 +65,7 @@ class Storage
       case "child": return $this->cache[$id]->axis("child"); break;
       case "descendant": return $this->cache[$id]->axis("descendant"); break;
       case "self":  return array($id); break;
-      case "descendant-or-self":  array_merge(array($id), $this->cache[$id]->axis("descendant")); break;
+      case "descendant-or-self":  return array_merge(array($id), $this->cache[$id]->axis("descendant")); break;
       case "following-sibling":
         return array_slice($this->cache[$this->cache[$id]->axis("parent")]->axis("child"),
                array_search($id, $this->cache[$this->cache[$id]->axis("parent")]->axis("child")) + 1);
@@ -166,7 +166,7 @@ class Storage
             if (get_class($this->cache[$item]->properties()) == "attribute" and $body->nodeName == $nodeTest) {
               $sequence[] = $item;
             }
-          } elseif (get_class($this->cache[$item]->properties() == "element") and $body->nodeName == $nodeTest) {
+          } elseif (get_class($this->cache[$item]->properties()) == "element" and $body->nodeName == $nodeTest) {
             $sequence[] = $item;
           }
       	break;
