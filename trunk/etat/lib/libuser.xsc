@@ -49,7 +49,7 @@ declare function dropRole($name) {
 (: Benuzter einlogen :)
 declare function binLogin($name) external binLogin;
 declare function login($name, $password) {
-  if (count(sql("login", ($name, $password))) = 0) then
+  if (count(sql("login", ($name, $password))/*) = 0) then
     <error>Der übergebene Benuztername oder das übergebene Passwort ist falsch!</error>
   else
     binLogin($name)

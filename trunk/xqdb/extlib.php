@@ -170,7 +170,7 @@ function __grant($target, $role, $action = null, $node = null, $instance = null,
    string[] $target: Knoten von dem das Recht entfernt werden soll
    string[] $role: Rolle für die das Zugriffsrecht entfernt werden soll
  */
-function __revoke($target, $role) {
+function __revoke($target, $role, $action) {
   
   
 }

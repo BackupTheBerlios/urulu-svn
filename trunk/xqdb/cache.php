@@ -80,9 +80,9 @@ class Cache
       
       /* Achse auswerten */
       switch ($axis) {
+        case "access":
         case "attribute":
         case "child":
-        case "descendant":
           $this->axis[$axis] = array();
           foreach (__executeSQL("node_select_" . $axis, array($this->uri, $this->id), true) as $tupel) {
             $this->axis[$axis][] = $tupel[$axis];

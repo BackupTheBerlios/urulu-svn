@@ -63,9 +63,17 @@ class Storage
     switch ($axis) {
       case "attribute":  return $this->cache[$id]->axis("attribute"); break;
       case "child": return $this->cache[$id]->axis("child"); break;
-      case "descendant": return $this->cache[$id]->axis("descendant"); break;
+      case "descendant":
+        $stack = $this->cache[$id]->axis("child");
+        $sequence = array();
+        while (count($stack) > 0) {
+          $sequence[] = $id = array_shift($stack);
+          $stack = array_merge($this->cache[$id]->axis("child"), $stack);
+        }
+        return $sequence;
+      break;
       case "self":  return array($id); break;
-      case "descendant-or-self":  return array_merge(array($id), $this->cache[$id]->axis("descendant")); break;
+      case "descendant-or-self":  return array_merge(array($id), $this->axis($id, "descendant")); break;
       case "following-sibling":
         return array_slice($this->cache[$this->cache[$id]->axis("parent")]->axis("child"),
                array_search($id, $this->cache[$this->cache[$id]->axis("parent")]->axis("child")) + 1);
@@ -161,7 +169,8 @@ class Storage
         
         /* Step mit Namen */
         default:
-          $body = $this->cache[$item]->properties();
+          unset($body);
+          $body =& $this->cache[$item]->properties();
           if ($axis == "attribute") {
             if (get_class($this->cache[$item]->properties()) == "attribute" and $body->nodeName == $nodeTest) {
               $sequence[] = $item;
@@ -297,7 +306,7 @@ class Storage
       	  
    	      /* Wurzelknoten erstellen */
           $id = $this->registerItem(new Document($tupel[0]['documentURI'], $tupel[0]['stringValue'], $tupel[0]['typeName'], $tupel[0]['typedValue'])
-              , "db", $tupel[0]['tableName'], $tupel[0]['id'], 0, null, null, null);
+              , "db", $tupel[0]['tableName'], $tupel[0]['id'], 0, null, null);
           $this->doc["db://" . $encodedURI['URI']] = $id;
         break;
         
@@ -312,29 +321,30 @@ class Storage
   }
   
   /* Fügt dem Cache ein Element dazu
-     AtomicValue $item: Item, das Registeriert werden soll
+     Item $item: Item, das Registeriert werden soll
      string $storage: Gibt den Speicherort des Knotens an
      string $path: Pfad des Dokuments, in dem der Knoten gespeichert ist
      string $parent: ID des Vaterelements
      string[] $child: Kinderelemente des Knotens
-     string[] $descendant: Nachkommen des Knotens
      string[] $attribute: Attribute des Knotens
+     string[] $access: Attribute des Knotens
      string return: Gibt die ID des Items zurück
    */
-  function registerItem($item, $storage = "tmp", $path = "null", $id = null, $parent = "0", $child = array(), $descendant = array(), $attribute = array()) {
+  function registerItem($item, $storage = "tmp", $path = "null", $id = null, $parent = "0", $child = array(), $attribute = array(), $access = array()) {
     if ($id == null) {
       $id = md5(uniqid(microtime()) + rand());
     }
     $this->cache[$id] = new Cache($id, get_class($item), $storage, $path, array_merge(
       ($parent !== null ? array('parent' => 0) : array()), 
       ($child !== null ? array('child' => array()) : array()),
-      ($descendant !== null ? array('descendant' => array()) : array()),
-      ($attribute !== null ? array('attribute' => array()) : array())), $item);
+      ($attribute !== null ? array('attribute' => array()) : array()),
+      ($access !== null ? array('attribute' => array()) : array())), $item);
     return $id;
   }
   
   /* Prüft ob ein Item in Cache vorhanden ist und wenn nicht wird es dort registriert
      string $id: ID des Objekts, das registriert werden soll
+     string $type: Type des Items
      string $storage: Gibt den Speicherort des Knotens an
      string $path: Pfad des Dokuments, in dem der Knoten gespeichert ist
    */
@@ -396,7 +406,7 @@ class Storage
       $this->cache[$id]->updateAxis("parent", $parent);      
       
       /* Kinderelemente registrieren */
-      $descendant = array_merge(array($id), $this->cache[$id]->axis("descendant"));
+      $descendant = array_merge(array($id), $this->axis($id, "descendant"));
       foreach ($descendant as $item) {
         foreach ($this->cache[$item]->axis("attribute") as $attribute) {
           $this->changelog[$attribute] = array('Action' => "insert");
@@ -409,7 +419,8 @@ class Storage
         
         /* StringValue updaten */
         $children = $this->cache[$ancestor]->axis('child');
-        $body = $this->cache[$ancestor]->properties();
+        unset($body);
+        $body =& $this->cache[$ancestor]->properties();
         $body->stringValue = "";
         $loop = -1;
         foreach ($children as $key => $index) {
@@ -423,22 +434,6 @@ class Storage
         	PEAR::raiseError("Interner Fehler!");
         }
         $this->cache[$ancestor]->updateProperties($body);
-
-        /* Nachfolger setzen */
-        $descendant = $this->cache[$ancestor]->axis('descendant');
-        
-        if (in_array($id, $this->cache[$ancestor]->axis('descendant'))) {
-          $this->cache[$ancestor]->updateAxis("descendant", array_merge((array_search($children[$loop], $descendant) != 0 ?
-              array_slice($descendant, 0, array_search($children[$loop], $descendant)) : array()),
-              array($id), $this->cache[$id]->axis('descendant'), (isset($children[$loop + 1]) ? array_slice($descendant, 
-              array_search($children[$loop + 1], $descendant)) : array())));
-        } elseif ($loop == count($children) - 1) {
-          $this->cache[$ancestor]->updateAxis("descendant", array_merge($descendant, array($id), $this->cache[$id]->axis('descendant')));
-        } else {
-          $this->cache[$ancestor]->updateAxis("descendant", array_merge(($loop == 0 ? array() : array_slice($descendant, 0, 
-              array_search($children[$loop + 1], $descendant))), array($id), $this->cache[$id]->axis('descendant'), 
-              array_slice($descendant, array_search($children[$loop + 1], $descendant))));
-        }
         
         /* Changelog Updaten */
         $this->registerUpdate($ancestor, "all");
@@ -466,13 +461,13 @@ class Storage
     
     /* Kinderelemente registrieren */
     $mapping = array(0 => 0, $id => $newID);
-    foreach ($this->cache[$id]->axis("descendant") as $item) {
+    foreach ($this->axis($id, "descendant") as $item) {
       $newItem = $this->registerItem($this->cache[$item]->properties(), $encodedURI['Storage'], $encodedURI['URI']);
       $mapping[$item] = $newItem;
     }
     
     /* Alte Struktur übernehmen */
-    foreach (array_merge($id, $this->cache[$id]->axis("descendant")) as $item) {
+    foreach (array_merge($id, $this->axis($id, "descendant")) as $item) {
       
       /* Attribue übernehmen */
       if (count($this->cache[$item]->axis("attribute")) > 0) {
@@ -485,16 +480,14 @@ class Storage
       }
       
       /* Andere Achsen updaten */
-      foreach (array("child", "descendant") as $axis) {
-      	$set = $this->cache[$item]->axis($axis);
-      	if (count($set) > 0) {
-        	$newSet = array();
-        	foreach ($set as $axisID) {
-        		$newSet[] = $mapping[$axisID];
-        	}
-          $this->cache[$mapping[$item]]->updateAxis($axis, $newSet);
+    	$set = $this->cache[$item]->axis("child");
+    	if (count($set) > 0) {
+      	$newSet = array();
+      	foreach ($set as $axisID) {
+      		$newSet[] = $mapping[$axisID];
       	}
-      }
+        $this->cache[$mapping[$item]]->updateAxis("child", $newSet);
+    	}
       
       /* Vaterelement updaten */
       $this->cache[$mapping[$item]]->updateAxis("parent", $mapping[$this->cache[$item]->axis("parent")]);
@@ -545,7 +538,7 @@ class Storage
 
     /* Knoten und Kinderknoten löschen */
     $parent = $this->cache[$parent]->axis("parent");
-    $items = array_merge(array($id), $this->cache[$id]->axis("descendant"));
+    $items = array_merge(array($id), $this->axis($id, "descendant"));
     foreach ($items as $item) {
       foreach ($this->cache[$item]->axis("attribute") as $attribute) {
       	$this->changelog[$attribute] = array('Action' => "delete", 'URI' => $this->cache[$id]->uri(), 'class' => get_class($this->cache[$id]->properties()));
@@ -559,11 +552,6 @@ class Storage
     if ($parent != null) {
       $this->cache[$parent]->updateAxis("child", array_intersect($this->cache[$parent]->axis("child"), array($id)));
       $this->registerUpdate($parent, "child");
-      
-      for ($id = $parent; $id != null; $id = $this->cache[$id]->axis('parent')) {
-        $this->cache[$id]->updateAxis("descendant", array_intersect($this->cache[$id]->axis("descendant"), $items));
-        $this->registerUpdate($id, "descendant");
-      }
     }
   }
   
@@ -689,10 +677,9 @@ class Storage
           	        }
                   break;
                   case "child";
-                  case "descendant";
-          	        __executeSQL("node_delete_index_" . $item['Target'] . "_by_parent", array($this->cache[$id]->uri(), $id));
+          	        __executeSQL("node_delete_index_child_by_parent", array($this->cache[$id]->uri(), $id));
           	        foreach ($this->cache[$id]->axis("child") as $order => $child) {
-             	        __executeSQL("node_insert_index_" . $item['Target'], array($this->cache[$id]->uri(), $id, $child,
+             	        __executeSQL("node_insert_index_child", array($this->cache[$id]->uri(), $id, $child,
              	          $order, get_class($this->cache[$id]->properties()), get_class($this->cache[$child]->properties())));
           	        }
           	        // ancestor müssen noch upgedatet werden
@@ -709,6 +696,7 @@ class Storage
         	  
         	  /* Insert und Update ausfürhen */
             if ($mode != null) {
+              unset($body);
               $body =& $this->cache[$id]->properties();
               switch ($class) {                            	
                 case "document": 
@@ -723,8 +711,8 @@ class Storage
             	      __executeSQL("create_comment", array($this->cache[$id]->uri()));
             	      __executeSQL("create_access", array($this->cache[$id]->uri()));
             	      __executeSQL("create_index_attribute", array($this->cache[$id]->uri()));
+            	      __executeSQL("create_index_access", array($this->cache[$id]->uri()));
             	      __executeSQL("create_index_child", array($this->cache[$id]->uri()));
-            	      __executeSQL("create_index_descendant", array($this->cache[$id]->uri()));
                   
                   /* Dokumentknoten updaten */
                   } else {
@@ -765,11 +753,6 @@ class Storage
                 __executeSQL("node_insert_index_child", array($this->cache[$id]->uri(), $this->cache[$id]->axis('parent'), $id, 
           	      array_search($id, $this->cache[$this->cache[$id]->axis('parent')]->axis('child')), $class, 
           	      get_class($this->cache[$this->cache[$id]->axis('parent')]->properties())));
-          	    foreach ($this->axis($id, "ancestor") as $ancestor) {
-            	    __executeSQL("node_insert_index_descendant", array($this->cache[$id]->uri(), $ancestor, $id, 
-            	      array_search($id, $this->cache[$ancestor]->axis('descendant')), $class, 
-            	      get_class($this->cache[$ancestor]->properties())));          	    	
-          	    }
               }
             }
               

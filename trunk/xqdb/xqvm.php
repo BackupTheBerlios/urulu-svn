@@ -16,6 +16,7 @@ require_once("DB.php");
 
 /* Verschidene Pointer laden */
 require_once("item/atomicvalue.php");
+require_once("item/access.php");
 require_once("item/comment.php");
 require_once("item/document.php");
 require_once("item/element.php");

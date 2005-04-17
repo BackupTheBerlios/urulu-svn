@@ -41,7 +41,8 @@ import module "libuser";
 
   <action> 
     Benuzter anmelden
-    { login("test", "test") } 
+    { login("test", "test23"),
+      login("test", "test") } 
   </action>
 
   <action> 

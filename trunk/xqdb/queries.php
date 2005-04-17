@@ -134,7 +134,7 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
     role INT(11) NOT NULL default 0,
     type ENUM('execute', 'grant') NOT NULL,
     instance VARCHAR(32) NOT NULL default '*',
-    descendant INT(11) NOT NULL default 0
+    descendant INT(11) NOT NULL default 0,
     PRIMARY KEY  (id),
     KEY action (role, action)
   ) TYPE=MyISAM AUTO_INCREMENT=1", 1),
@@ -144,6 +144,12 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
     attribute VARCHAR(32) NOT NULL default 0,
     PRIMARY KEY  (element, attribute)
   ) TYPE=MyISAM AUTO_INCREMENT=1", 1),
+/* Erstellt die Tabelle für die Attribute */
+  'create_index_access' => array("CREATE TABLE ?_index_access (
+    element VARCHAR(32) NOT NULL default 0,
+    access VARCHAR(32) NOT NULL default 0,
+    PRIMARY KEY  (element, access)
+  ) TYPE=MyISAM AUTO_INCREMENT=1", 1),
 /* Erstellt die Tabelle für die Children */
   'create_index_child' => array("CREATE TABLE ?_index_child (
     parent VARCHAR(32) NOT NULL default 0,
@@ -152,15 +158,6 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
     childType ENUM('element', 'pi', 'comment', 'text') NOT NULL,
     parentType ENUM('document', 'pi', 'element') NOT NULL,
     PRIMARY KEY (parent, child)
-  ) TYPE=MyISAM AUTO_INCREMENT=1", 1),
-/* Erstellt die Tabelle für die Descendants */
-  'create_index_descendant' => array("CREATE TABLE ?_index_descendant (
-    parent VARCHAR(32) NOT NULL default 0,
-    descendant VARCHAR(32) NOT NULL default 0,
-    intOrder INT(11) NOT NULL default 0,
-    descendantType ENUM('element', 'pi', 'comment', 'text') NOT NULL,
-    parentType ENUM('document', 'pi', 'element') NOT NULL,
-    PRIMARY KEY (parent, descendant)
   ) TYPE=MyISAM AUTO_INCREMENT=1", 1),
   
 /*
@@ -174,10 +171,10 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
  */
 /* Liest einen Dokumentknoten auf */
  'node_select_document' => array("SELECT * FROM documents WHERE documentURI='?' LIMIT 1", 1),
-/* Liest alle Nachfolger auf */
- 'node_select_descendant' => array("SELECT descendant, descendantType as type FROM ?_index_descendant WHERE parent='?' ORDER BY intOrder", 2),
 /* Listet alle Kinderelemente auf */
  'node_select_child' => array("SELECT child, childType as type FROM ?_index_child WHERE parent='?' ORDER BY intOrder", 2),
+/* Listet alle Zugriffsknoten auf */
+ 'node_select_access' => array("SELECT access, 'access' as type FROM ?_index_access WHERE element='?'", 2),
 /* Listet alle Attribute auf */
  'node_select_attribute' => array("SELECT attribute, 'attribute' as type FROM ?_index_attribute WHERE element='?'", 2),
 /* Findet die Werte des Bodys */
@@ -187,8 +184,6 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
  'node_insert_index_attribute' => array("INSERT INTO ?_index_attribute (element, attribute) VALUES ('?', '?')", 3),
 /* Erstellt einen Index zu einem Kinderknoten */
  'node_insert_index_child' => array("INSERT INTO ?_index_child (parent, child, intOrder, childType, parentType) VALUES ('?', '?', '?', '?', '?')", 6),
-/* Erstellt einen Index zu einem Nachkomme */
- 'node_insert_index_descendant' => array("INSERT INTO ?_index_descendant (parent, descendant, intOrder, descendantType, parentType) VALUES ('?', '?', '?', '?', '?')", 6),
 /* Fügt en Dokumentknoten ein */
  'node_insert_document' => array("INSERT INTO documents (documentURI, tableName, typeName, stringValue, typedValue, id) VALUES ('?', '?', '?', '?', '?', '?')", 6),
 /* Fügt ein Elementknoten ein */
@@ -219,11 +214,7 @@ $GLOBALS['XQDB_Queries'] = array('mysql' => array(
  'node_delete_index_attribute' => array("DELETE FROM ?_index_attribute WHERE element='?'", 2),
 /* Löscht alle links zu Kinder des Knotens */
  'node_delete_index_child_by_parent' => array("DELETE FROM ?_index_child WHERE parent='?'", 2),
-/* Löscht alle links zu Nachfahren des Knotens */
- 'node_delete_index_descandant_by_parent' => array("DELETE FROM ?_index_descendant WHERE parent='?'", 2),
 /* Löscht alle links zu Kinder des Knotens */
  'node_delete_index_child_by_child' => array("DELETE FROM ?_index_child WHERE child='?' LIMIT 1", 2),
-/* Löscht alle links zu Nachfahren des Knotens */
- 'node_delete_index_descandant_by_child' => array("DELETE FROM ?_index_descendant WHERE descendant='?' LIMIT 1", 2),
 ));
 ?>
